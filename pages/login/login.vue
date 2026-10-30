@@ -11,11 +11,35 @@
 				<input type="password" placeholder="请输入密码" v-model="form.password">
 			</view>
 
-			<view class="join">注册账号</view>
-			<view class="join">忘记密码</view>
+			<view class="join" @click="openPopup">注册账号</view>
+			<view class="join" @click="">忘记密码</view>
 
-			<button class="login-btn" @click="handleLogin">登录</button>
+			<button class="login-btn" @click="">登录(演示)</button>
 		</view>
+		<!-- 注册账号 / 忘记密码 弹窗：只有点击弹窗内部右上角的“×”才会关闭 -->
+		<view class="popup-mask" v-if="popupVisible">
+			<view class="popup-dialog">
+				<view class="popup-head">
+					<text class="popup-title">注册账号</text>
+					<text class="popup-close" @click="closePopup">×</text>
+				</view>
+				<view class="popup-item">
+					<text class="popup-label">账号:</text>
+					<input type="text" placeholder="请输入账号" v-model="popupForm.account" />
+				</view>
+				<view class="popup-item">
+					<text class="popup-label">密码:</text>
+					<input type="password" placeholder="请输入密码" v-model="popupForm.password" />
+				</view>
+				<view class="popup-item">
+					<text class="popup-label">确认密码:</text>
+					<input type="password" placeholder="请再次输入密码" v-model="popupForm.confirmPassword" />
+				</view>
+				<text class="popup-label">&nbsp;</text>
+				<button class="popup-btn" @click="handlePopupSubmit">注册</button>
+			</view>
+		</view>
+
 		<view>
 			<button @click="">批量添加或减少数据</button>
 		</view>
@@ -35,20 +59,21 @@
 				form: {
 					username: '',
 					password: ''
+				},
+				// 弹窗是否显示
+				popupVisible: false,
+				// 弹窗模式：register = 注册账号，forgot = 忘记密码
+				popupMode: 'register',
+				// 弹窗内表单
+				popupForm: {
+					account: '',
+					password: '',
+					confirmPassword: ''
 				}
 			}
 		},
 		methods: {
-			select() {
-				uni.showActionSheet({
-					itemList: this.sex_arrs,
-					//success请求成功返回res值，并把res当参数执行匿名函数
-					success: (res) => {
-						console.log(res);
-						console.log(this.sex_arrs[res.tapIndex])
-					}
-				})
-			},
+
 
 			handleLogin() {
 				// 获取输入框的值
@@ -75,6 +100,96 @@
 
 				// 在这里写登录请求逻辑
 				// loginApi(username,password)
+			},
+
+
+			openPopup(mode) {
+				this.popupMode = mode
+				this.popupForm = {
+					account: '',
+					password: '',
+					confirmPassword: ''
+				}
+				this.popupVisible = true
+			},
+
+			// 关闭弹窗：只有点击弹窗内部右上角的“×”才会触发
+			closePopup() {
+				this.popupVisible = false
+			},
+
+			// 弹窗内“确认”按钮：非空校验 + 两次密码一致性校验
+			async handlePopupSubmit() {
+				const f = this.popupForm
+				if (!f.account) {
+					uni.showToast({
+						title: '请输入账号',
+						icon: 'none'
+					})
+					return
+				}
+				if (!f.password) {
+					uni.showToast({
+						title: '请输入密码',
+						icon: 'none'
+					})
+					return
+				}
+				if (!f.confirmPassword) {
+					uni.showToast({
+						title: '请输入确认密码',
+						icon: 'none'
+					})
+					return
+				}
+				if (f.password !== f.confirmPassword) {
+					uni.showToast({
+						title: '两次输入的密码不一致',
+						icon: 'none'
+					})
+					return
+				}
+
+
+				try {
+					// 云函数调用是支持 await 的，能拿到真实返回结果
+					const res = await uniCloud.callFunction({
+						name: "register", // 改成你已上传的注册云函数名
+						data: {
+							action: "add",
+							account: f.account,
+							password: f.password
+						}
+					})
+					console.log('云函数返回：', res.result)
+
+					// 关键：读 res.result，并且加 ?. 防止字段缺失再报错
+					if (res.result?.code === 0) {
+						uni.showToast({
+							title: '注册成功'
+						})
+						this.popupForm = {
+							account: '',
+							password: '',
+							confirmPassword: ''
+						}
+						this.closePopup()
+					} else {
+						uni.showToast({
+							title: (res.result && res.result.msg) || '注册失败',
+							icon: 'none'
+						})
+					}
+				} catch (err) {
+					console.error('注册异常：', err)
+					uni.showToast({
+						title: '网络异常，请重试',
+						icon: 'none'
+					})
+				}
+
+				console.log(this.popupForm)
+				this.closePopup()
 			},
 
 			async runBatch() {},
@@ -179,7 +294,6 @@
 
 <style lang="scss" scoped>
 	.login-box {
-
 		width: 100%;
 		padding: 40rpx 0 0 0;
 		/* 磨砂玻璃半透明 */
@@ -206,9 +320,11 @@
 		}
 
 		.join {
-			font-size: 12px;
+			font-size: 14px;
 			display: inline;
-			padding: 140rpx;
+			padding: 125rpx;
+			color: #1677ff;
+			text-decoration: underline;
 
 		}
 
@@ -264,6 +380,88 @@
 			&:focus {
 				background: rgba(40, 120, 255, 1);
 			}
+		}
+	}
+
+	/* ===== 注册账号 / 忘记密码 弹窗 ===== */
+	.popup-mask {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.popup-dialog {
+		width: 600rpx;
+		background: #fff;
+		border-radius: 20rpx;
+		padding: 30rpx 30rpx 40rpx;
+	}
+
+	.popup-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 30rpx;
+	}
+
+	.popup-title {
+		font-size: 50rpx;
+		font-weight: 600;
+		color: #333;
+	}
+
+	.popup-close {
+		width: 60rpx;
+		height: 60rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 40rpx;
+		color: #999;
+	}
+
+	.popup-item {
+		margin-bottom: 24rpx;
+	}
+
+	.popup-item .popup-label {
+		display: block;
+		font-size: 35rpx;
+		color: #666;
+		margin-bottom: 10rpx;
+	}
+
+	.popup-item input {
+		width: 100%;
+		height: 70rpx;
+		box-sizing: border-box;
+		padding: 20rpx 24rpx;
+		border: 1rpx solid rgba(0, 0, 0, 0.2);
+		border-radius: 10rpx;
+		background: #f7f8fa;
+		font-size: 22rpx;
+		color: #333;
+	}
+
+	.popup-btn {
+		margin-top: 30rpx;
+		width: 100%;
+		padding: 20rpx 0rpx;
+		border: none;
+		border-radius: 10rpx;
+		background: rgba(40, 120, 255, 1);
+		color: #fff;
+		font-size: 36rpx;
+
+		&:active {
+			background: rgba(40, 120, 255, 0.7);
 		}
 	}
 </style>

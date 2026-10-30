@@ -63,7 +63,7 @@
 
 <style lang="scss" scoped>
 	.WallpaperBox {
-		padding-top: 50rpx;
+		padding-top: 30rpx;
 
 		.content {
 			width: 720rpx;
@@ -85,9 +85,19 @@
 						border-radius: 10rpx;
 					}
 
+					/* #ifdef H5 */
 					:last-child {
 						margin-right: 30rpx;
 					}
+
+					/* #endif */
+
+					/* #ifdef MP-WEIXIN */
+					.is-last {
+						margin-right: 30rpx;
+					}
+
+					/* #endif */
 				}
 			}
 		}

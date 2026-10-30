@@ -117,9 +117,7 @@
 			//H5 没问题；
 			//**微信小程序在组件解析阶段就执行这个 API，
 			//会干扰页面初始化渲染时序**，会加剧插槽响应式异常。
-			uni.showToast({
-				title: "支付成功"
-			})
+
 		},
 
 		onReady() {
@@ -201,7 +199,7 @@
 					app.globalData.CharacterImgArr = this.CharacterImgArr
 					app.globalData.ShowThePictureImgArr = this.ShowThePictureImgArr
 					app.globalData.ThemeItemListImgArr = this.ThemeItemListImgArr
-					console.log(this.ThemeItemListImgArr)
+					//console.log(this.ThemeItemListImgArr)
 					//console.log(this.ShowThePictureImgArr)
 					//console.log(this.SceneryImgArr)
 

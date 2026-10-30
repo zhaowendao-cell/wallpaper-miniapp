@@ -1,0 +1,7 @@
+{
+	"name": "WallPaperCBatchInsert",
+	"dependencies": {},
+	"extensions": {
+		"uni-cloud-jql": {}
+	}
+}
