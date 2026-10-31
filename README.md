@@ -30,9 +30,9 @@
   建议尺寸 750×1334（或真机截图），文件名固定为四张。
 -->
 
-| 首页 | 分类 | 大图预览 | 我的 |
+| 首页 | 分类 | 分类预览 | 我的 |
 | :---: | :---: | :---: | :---: |
-| ![](docs/preview/home.png) | ![](docs/preview/classify.png) | ![](docs/preview/preview.png) | ![](docs/preview/mine.png) |
+| ![](docs/preview/home.png) | ![](docs/preview/classify.png) | ![](docs/preview/classify_in.png) | ![](docs/preview/mine.png) |
 
 ---
 
