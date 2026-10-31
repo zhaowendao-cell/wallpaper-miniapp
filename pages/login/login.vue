@@ -79,8 +79,8 @@
 				// 获取输入框的值
 				const username = this.form.username
 				const password = this.form.password
-				console.log('账号：', username)
-				console.log('密码：', password)
+				//console.log('账号：', username)
+				//console.log('密码：', password)
 
 				// 简单非空校验
 				if (!this.form.username) {

@@ -94,7 +94,7 @@
 		},
 		onLoad() {},
 		login() {
-			console.log("hhhhhhhhhhhhhhhhhhhhh")
+			//console.log("hhhhhhhhhhhhhhhhhhhhh")
 			uni.navigateTo({
 				url: '@/pages/tabbar/mine/login'
 			})

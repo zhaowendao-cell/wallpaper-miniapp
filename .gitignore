@@ -6,3 +6,5 @@ dist/
 *.log
 .DS_Store
 Thumbs.db
+# 本地模板副本（与项目无关，不纳入版本管理）
+wallpaper/
